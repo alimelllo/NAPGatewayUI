@@ -1,0 +1,13 @@
+.button {
+  cursor: pointer;
+  border: none;
+  outline: none;
+  background-color: transparent;
+}
+
+.button__hover--red:hover{
+    color: red;
+}
+.button__hover--blue:hover{
+    color: blue;
+}

@@ -1,0 +1,46 @@
+/* @font-face {
+  font-family: 'BNazanin';
+  font-style: normal;
+  font-weight: 400;
+  src: url('./assets/font/BNazanin/bnazanb.eot');
+  src: local('BNazanin'), local('BNazanin'),
+        url('./assets/font/BNazanin/bnazanb.eot') format('eot'),
+        url('./assets/font/BNazanin/bnazanb.ttf') format('ttf'),
+        url('./assets/font/BNazanin/bnazanb.woff') format('woff')
+
+} */
+/* 
+@font-face {
+    font-family: "Shabnam";
+    src: url("./assets/fonts/Shabnam-FD.eot");
+    src: url("./assets/fonts/Shabnam-FD.eot?#iefix") format("embedded-opentype"), url("./assets/fonts/Shabnam-FD.woff") format("woff"), url("./assets/fonts/Shabnam-FD.ttf") format("truetype");
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "Shabnam";
+    src: url("./assets/fonts/Shabnam-Bold-FD.eot");
+    src: url("./assets/fonts/Shabnam-Bold-FD.eot?#iefix") format("embedded-opentype"), url("./assets/fonts/Shabnam-Bold-FD.woff") format("woff"), url("./assets/fonts/Shabnam-Bold-FD.ttf") format("truetype");
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: "Shabnam";
+    src: url("./assets/fonts/Shabnam-Light-FD.eot");
+    src: url("./assets/fonts/Shabnam-Light-FD.eot?#iefix") format("embedded-opentype"), url("./assets/fonts/Shabnam-Light-FD.woff") format("woff"), url("./assets/fonts/Shabnam-Light-FD.ttf") format("truetype");
+    font-weight: 300;
+}
+
+body {
+    margin: 0;
+    font-family: 'Shabnam' !important;
+    -webkit-font-smoothing: 'Shabnam' !important;
+    -moz-osx-font-smoothing: 'Shabnam' !important;
+    box-sizing: border-box;
+    direction: rtl;
+    text-align: right;
+}
+
+code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+} */

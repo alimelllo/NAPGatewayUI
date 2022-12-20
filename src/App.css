@@ -1,0 +1,40 @@
+.link:hover {
+    cursor: pointer;
+}
+.disabled-link {
+    pointer-events: none;
+    border: 1px solid #999999;
+    background-color: #cccccc;
+    color: #666666;
+}
+.flex-row-fluid {
+    -webkit-box-flex: 1;
+    flex: 1 auto;
+    -ms-flex: 1 0 0px;
+    min-width: 0;
+}
+
+.bgi-position-center {
+    background-position: center;
+}
+
+.bgi-no-repeat {
+    background-repeat: no-repeat;
+}
+
+.bgi-size-cover {
+    background-size: cover;
+}
+.users-panel-status {
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
+    border: 2px solid white;
+}
+.niliDatePicker{
+    z-index: 10 !important;
+}
+
+body > iframe{
+    pointer-events: none;
+}

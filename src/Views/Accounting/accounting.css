@@ -1,0 +1,14 @@
+.apearAnimation{
+    animation: apearAnimation ease-out 1.2s;
+}
+@keyframes apearAnimation {
+    from {
+      opacity: 0.4;
+      transform: translateX(40rem);
+    }
+  
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }

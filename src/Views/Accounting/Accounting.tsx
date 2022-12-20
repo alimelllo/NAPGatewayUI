@@ -1,0 +1,260 @@
+import React, { useEffect, useState } from 'react';
+import { dashboardActions } from '../../Actions/Dashboard/action';
+import { IDashboardState } from '../../Actions/Dashboard/model';
+import { IApplicationState } from '../../Store/state';
+import { connect } from 'react-redux';
+import { useTranslation, Translation } from 'react-i18next';
+import GymLoading from '../../GeneralComponents/GymLoading/GymLoading';
+import Select from 'react-select';
+import NDate from '@nepo/ndate';
+import moment from 'moment';
+import API from "../../GeneralComponents/baseURL";
+import DatePicker from '../../GeneralComponents/Calendar'
+import  './accounting.css';
+import loading from '../../assets/loading.svg'
+import '../../GeneralComponents/GymLoading/GymLoading.css';
+
+type IProps = typeof dashboardActions & IDashboardState 
+
+const Accounting = ( props: IProps ) => {
+	const [t] = useTranslation()
+	const userAccessData = {
+		show: { roles: ["Operator", "Manager", "Supervisor"], withNoAccessPage: true },
+	}
+    const [serviceName, setServiceName] = useState<string>('')
+    const [clientName, setClientName] = useState<string>('')
+    const [fromDate, setFromDate] = useState<string>('')
+    const [toDate, setToDate] = useState<string>('');
+ 
+    const [ price , setPrice ] = useState<any>(0);
+    const [ description , setDescription ] = useState<any>('');
+    const [serviceType, setServiceType] = useState<string>('all')
+    const [getalldata, setGetalldata] = useState<number>(-7);
+
+    const [ showTable , setShowTable ] = useState<boolean>(false); 
+    const [ error , setError ] = useState<any>('');
+    const [ accountingList , setAccountingList ] = useState<any>([]);
+    const [ showAddForm , setShowAddForm ] = useState<boolean>(false);
+
+    const [ requiredMessage , setRequiredMessage] = useState<boolean>(false);
+    const [ isLoading , SetIsLoading ] = useState<boolean>(false);
+  
+    let [ pageNumber , SetPageNumber ] = useState<number>(1);
+
+	useEffect(() => {
+		document.title = t("accounting")
+	}, [t])
+
+    useEffect(() => {
+        props.getAllServicesName( serviceType);
+        props.getClientsName();
+    }, [ getalldata,serviceType ] )
+
+    props.clientsName.data.map( (item:any , index:any ) => 
+        item.value === 'all' ? props.clientsName.data.splice(index , 1) : null
+    );
+    props.allservicesName.data.map( (item:any , index:any ) => 
+        item.value === 'all' ? props.allservicesName.data.splice(index , 1) : null
+    );
+
+   const GetPageNumberToLoad = async () => {
+
+    try{
+            const result = await API.get(`NAPGateWay/AccountingsQuery/GetAccountingByClientService?ClientName=${clientName}&ServiceName=${serviceName}&PageNumber=0&PageSize=0&SkipCount=0`);
+            console.log(result)
+            if( result.data.length > 5 ){
+                 const restLeft = result.data.length % 5;
+            let subtracToFive = result.data.length - restLeft ;
+            let pagesCount = subtracToFive / 5;
+            let pageNum =  pagesCount + 1 ;
+            AccountingsQuery( clientName , serviceName , pageNum )
+            SetPageNumber(pageNum);
+            console.log(pageNum)
+            }
+        }
+        catch(error){
+            console.log(error)
+        }
+   }
+
+    const AccountingsQuery = async ( clientName:string , serviceName:string , pageNum?:number ) => {
+        SetIsLoading(true);
+        console.log(pageNum);
+        try{
+           const result = await API.get(`NAPGateWay/AccountingsQuery/GetAccountingByClientService?ClientName=${clientName}&ServiceName=${serviceName}&PageNumber=${pageNum ? pageNum : 1}&PageSize=${5}&SkipCount=0`);
+           console.log(result)
+           SetIsLoading(false);
+           
+         const accountngDataList = result.data.map( ( item: any , index: number ) => ( <div className='col-12 text-center' style={{display: 'flex' , flexDirection : 'row' ,justifyContent : 'between'  , borderBottom : '1px solid #d9d9d9'}}>
+                       <p className='col-1 text-center mx-auto pt-3' >{index + 1}</p>
+                       <p className='col-2 text-center mx-auto pt-3' >{new NDate(item.fromDate).yearJalali + '/' + new NDate(item.fromDate).monthJalali + '/' + new NDate(item.fromDate).dayJalali}</p>
+                       <p className='col-2 text-center mx-auto pt-3' >{new NDate(item.toDate).yearJalali + '/' + new NDate(item.toDate).monthJalali + '/' + new NDate(item.toDate).dayJalali}</p>
+                       <p className='col-2 text-center mx-auto pt-3' >{item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</p>
+                       <p className='col-2 text-center mx-auto pt-3' >{item.description}</p>
+          </div>
+            ))
+
+            setAccountingList( accountngDataList );
+            setShowTable(true);
+            setError('');
+        }
+        catch( error ){
+            setError(' Fetching failed ( server error ) ')
+            SetIsLoading(false);
+           }
+        }
+
+
+    // my code ... 
+    // ======================= //
+
+
+
+    const addAccounting = async ( data:any ) => {
+   
+    if( data.clientName && data.serviceName && data.fromDate && data.toDate && data.price && data.description){
+        SetIsLoading(true);
+       GetPageNumberToLoad();
+        try{
+            await API.post(`NAPGateWay/AccountingsCommand/CreateByClientService` , data);
+             
+            setShowAddForm(false);
+            SetIsLoading(false);
+            setFromDate('');
+            setToDate('');
+            setPrice('');
+            setDescription('');
+            setError('');
+            setRequiredMessage(false); 
+         }
+         catch(err){
+             console.log(err.response)
+             setError(err.response.data[0])
+             SetIsLoading(false);
+            }
+    }
+    if( !data.clientName || !data.serviceName || !data.fromDate || !data.toDate || !data.price || !data.description ){
+            setRequiredMessage(true);     
+    }
+
+    }
+
+
+	return (
+		
+		<React.Fragment>
+			<GymLoading loading={props.pushes.loading} />
+			<div className="flex-fill p-4" dir='rtl'>
+			
+			
+					<div className="bg-white rounded shadow-sm h-lg-100">
+						
+
+                        <div className="flex-grow-1 mt-3 mt-lg-0  p-2 d-flex justify-content-between">
+
+                          <div className="row col-12 d-flex justify-content-between">
+
+                          <div className="col-4 form-group">
+                            <label htmlFor="clientName" className="d-flex justify-content-start">{t("clientNamefa")}</label>
+                            <Select
+                                value={props.clientsName.data.find(x => x.value == clientName)}
+                                options={props.clientsName.data}
+                                isRtl={true}
+                                onChange={(data: any) => setClientName(data.value)}
+                                placeholder={t("placeHselect")} />
+                           </div>
+
+                        <div className="col-4 form-group">
+                            <label htmlFor="serviceName" className="d-flex justify-content-start">{t("serviceNamefa")}</label>
+                            <Select
+                                value={props.allservicesName.data.find(x => x.value == serviceName)}
+                                options={props.allservicesName.data}
+                                isRtl={true}
+                                onChange={(data: any) => setServiceName(data.value)}
+                                placeholder={t("placeHselect")} />
+                        </div>
+                      
+
+                           <button onClick={() => { let copyState = 1; SetPageNumber(copyState) ; AccountingsQuery( clientName , serviceName , 1 )}} disabled={ clientName && serviceName ? false : true} className="col-2 btn btn-sm btn-success my-3 mt-4 shadow-lg">{t("فراخوانی")}</button> 
+
+                         </div>
+                        </div>
+					</div>
+
+
+                   { showTable && !error && <div className='TABLE-CONTAINER shadow-lg apearAnimation' style={{ background : '#fafafa' , width : '100%' ,  marginTop : '3rem' , borderRadius : '10px' , border: '1px solid #dbdbdb' }}>
+
+                <div style={{ display : 'flex' , flexDirection : 'row' , width : '100%' , background : '#e8e8e8' , border : '1px solid #c2c2c2' , borderTopLeftRadius : '10px' , borderTopRightRadius : '10px' }}>
+                   <p className='col-1 text-center pt-2 mx-auto' >ردیف</p>
+                   <p className='col-2 text-center pt-2 mx-auto' style={{ borderRight : '1px solid #d4d4d4'}}>از تاریخ</p>
+                   <p className='col-2 text-center pt-2 mx-auto' style={{ borderRight : '1px solid #d4d4d4'}}>تا تاریخ</p>
+                   <p className='col-2 text-center pt-2 mx-auto' style={{ borderRight : '1px solid #d4d4d4'}}>قیمت (ریال)</p>
+                   <p className='col-2 text-center pt-2 mx-auto' style={{ borderRight : '1px solid #d4d4d4'}} >شرح</p> 
+                </div>
+                
+
+                { showTable ? accountingList : null }
+                { accountingList.length == 0 && <p className='text-center pt-4'>هیچ موردی یافت نشد</p>} 
+                { isLoading && <div className="spinner" ><div className="spinnerLoading"><img src={loading} alt="Loading" /></div></div>}
+                { showTable && !error && 
+                <div className='d-flex flex-row justify-content-center ltr py-2 mt-2'>
+                     <p style={{cursor : 'pointer'}} onClick={()=>{ let copyState = pageNumber - 1; SetPageNumber(copyState); AccountingsQuery(clientName , serviceName , copyState ) }} className={ `text-center  ${ pageNumber <= 1 ? 'd-none' : 'd-block'} px-5`}> &#8810; </p>
+                     {` صفحه  ${pageNumber}`}
+                     <p onClick={ () =>{ let copyState = pageNumber + 1; SetPageNumber(copyState); AccountingsQuery(clientName , serviceName , copyState) }} style={{cursor : 'pointer'}} className={`text-lg text-center px-5 ${ accountingList.length < 5 ? 'd-none' : 'd-block'}`}> &#8811; </p>
+                </div> 
+                }
+                 </div> }
+
+                { showTable && !error && <button onClick={() => setShowAddForm(true)}  className="col-1 btn btn-sm btn-primary py-2 my-3 mt-4 shadow-lg apearAnimation">{t("افزودن +")}</button> }
+                { error && <h3 className='text-secondary col-12 text-center text-lg my-5'>{error}</h3>}
+
+
+
+
+
+           { showAddForm && <div className='d-flex flex-row flex-wrap mt-1 p-2 shadow-lg apearAnimation' style={{ backgroundColor : '#fafafa' , borderRadius : '10px'  }} dir='rtl'>
+        
+                           <div className="form-group mx-2">
+                            <label htmlFor="startTime" className="d-flex justify-content-start">
+                                {t("startDate")}
+                            </label>
+                            <DatePicker setTime={ false }
+                                onChange={(value) => { setFromDate(value) }}
+                                placeholder={t("placeHDate")} />
+                        </div>
+                            <div className="form-group mx-2">
+                            <label htmlFor="startTime" className="d-flex justify-content-start">
+                                {t("endDate")}
+                            </label>
+                            <DatePicker setTime={false}
+                                onChange={(value) => { setToDate(value) }}
+                                placeholder={t("placeHDate")} />
+                            </div>
+                      
+                             <div className="input-group col-3 d-flex flex-row">
+                             <label htmlFor="price" className="d-flex ">{"قیمت :"}</label>
+                              <input type="number" onChange={(data : any) => setPrice(data.target.value) }  className="form-control col-12 mt-4 mr-2" placeholder="قیمت  " aria-describedby="basic-addon1"/>
+                             </div>
+
+                             <div className="input-group col-3 d-flex flex-row">
+                             <label htmlFor="description" className="d-flex ">{"شرح :"}</label>
+                              <input onChange={(data : any) => setDescription(data.target.value) } type="text" className="form-control col-12 mt-4 mr-2" placeholder="شرح  " aria-describedby="basic-addon1"/>
+                             </div>
+
+                             { requiredMessage &&
+                           <div className='text-center text-danger mt-4 mr-2'>وارد کردن تمام موارد الزامی است</div>}
+                        <div className='col-12 justify-content-center'>   
+                            <button onClick={()=> addAccounting({ clientName : clientName , serviceName : serviceName , fromDate : fromDate , toDate : toDate , price : Number(price) , description : description})} className="col-1 btn btn-sm btn-primary py-2 my-3 mt-4 shadow-lg ">{"ذخیره"}</button> 
+                        </div>
+                           </div> }
+
+			</div>
+		</React.Fragment>
+	);
+}
+
+
+export default connect(
+	(state: IApplicationState) => state.dashboard,
+	dashboardActions,
+)( Accounting  );

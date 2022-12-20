@@ -1,0 +1,19 @@
+@font-face {
+    font-family: 'BNazaninFont';
+    src: url('../../fonts/BNazanin/bnazanb.eot');
+    src: local('BNazaninFont'), url('../../fonts/BNazanin/bnazanb.woff') format('woff'), url('../../fonts/BNazanin/bnazanb.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'B Nazanin';
+    src: url('../../fonts/BNazanin/bnazanb.eot');
+    src: local('B Nazanin'), url('../../fonts/BNazanin/bnazanb.woff') format('woff'), url('../../fonts/BNazanin/bnazanb.ttf') format('truetype');
+}
+
+
+/* use this class to attach this font to any element i.e. <p class="fontsforweb_fontid_9189">Text with this font applied</p> */
+.fontsforweb_fontid_9189 {
+	font-family: 'BNazaninFont' !important;
+}
+
+/* Font downloaded from FontsForWeb.com */
